@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'LK:statement_difference' %}">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    <input type="text" id="date" name="date" class="form-control" value="{{ date}}" aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <button class="btn btn-success" type="submit" id="button-addon2">Применить</button>
+                </div>
+            </form>
+            Сумма из выписки за {{ date }} - <b>{{ bank_sum }}</b><br>
+            Сумма из расходов за {{ date }} - <b>{{ expenses_sum }}</b>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            $('date').datepicker();
+        })
+    </script>
+{% endblock %}

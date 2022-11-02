@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.1/af-2.4.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.7/sb-1.3.4/sp-2.0.2/sl-1.4.0/sr-1.1.1/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.12.1/af-2.4.0/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/rr-1.2.8/sc-2.0.7/sb-1.3.4/sp-2.0.2/sl-1.4.0/sr-1.1.1/datatables.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+    <link href="/static/css/style.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+    <link href="/static/css/sidebar-white.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="/static/css/i.png" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js" integrity="sha512-IsNh5E3eYy3tr/JiX2Yx4vsCujtkhwl7SLqgnwLNgf04Hrt9BT9SXlLlZlWx+OK4ndzAoALhsMNcCmkggjZB1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" integrity="sha512-+EoPw+Fiwh6eSeRK7zwIKG2MA8i3rV/DGa3tdttQGgWyatG/SkncT53KHQaS5Jh9MNOT3dmFL0FjTY08And/Cw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+        /* Локализация datepicker */
+        $.datepicker.regional['ru'] = {
+            closeText: 'Закрыть',
+            prevText: 'Предыдущий',
+            nextText: 'Следующий',
+            currentText: 'Сегодня',
+            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+            dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+            dayNamesShort: ['вск', 'пнд', 'втр', 'срд', 'чтв', 'птн', 'сбт'],
+            dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            weekHeader: 'Не',
+            dateFormat: 'yy-mm-dd',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: ''
+        };
+        $.datepicker.setDefaults($.datepicker.regional['ru']);
+    </script>
+</head>
+
+<body>
+    <div class="sidebar">
+
+        <!-- Sidebar header -->
+        <div class="sidebar-header">
+            <a href="/" class="logo">
+                <img src="/static/images/1.jpg" alt="" class="rounded circle mr-2"> Повар
+            </a>
+            <a href="#" class="nav-link nav-icon rounded-circle ml-auto" data-toggle="sidebar">
+                <i data-feather="x"></i>
+            </a>
+        </div>
+        <!-- /Sidebar header -->
+
+        <!-- Sidebar body -->
+        <div class="sidebar-body">
+            <ul class="nav treeview mb-4" data-accordion>
+                <li class="nav-label">Меню бары</li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon {% if 'lk/money' in request.get_full_path %} active{% endif %}"
+                       href="/lk/money"><i data-feather="info"></i> Деньги
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/timetable' in request.get_full_path %} active{% endif %}"
+                       href="/lk/timetable"><i data-feather="info"></i> График
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/salary' in request.get_full_path %} active{% endif %}"
+                       href="/lk/salary"><i data-feather="info"></i> Зарплата
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/expenses' in request.get_full_path %} active{% endif %}"
+                       href="/lk/expenses"><i data-feather="info"></i> Расходы
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/pays' in request.get_full_path %} active{% endif %}"
+                       href="/lk/pays"><i data-feather="info"></i> Внесения/изъятия
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/employee' in request.get_full_path %} active{% endif %}"
+                       href="/lk/employee"><i data-feather="info"></i> Сотрудники
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/fine' in request.get_full_path %} active{% endif %}"
+                       href="/lk/fine"><i data-feather="info"></i> Штрафы
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/arrivals' in request.get_full_path %} active{% endif %}"
+                       href="/lk/arrivals"><i data-feather="info"></i> Приход пива
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/salary/employee_calculation' in request.get_full_path %} active{% endif %}"
+                       href="/lk/salary/employee_calculation"><i data-feather="info"></i> Расчет ЗП
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'blacklist' in request.get_full_path %} active{% endif %}"
+                       href="/lk/blacklist"><i data-feather="info"></i> Черный список
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'bars' in request.get_full_path %} active{% endif %}"
+                       href="/lk/bars"><i data-feather="info"></i> Бары
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'statement' in request.get_full_path %} active{% endif %}"
+                       href="/lk/statement?full=1"><i data-feather="info"></i> Банк
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/tovar_requests' in request.get_full_path %} active{% endif %}"
+                       href="/lk/tovar_requests"><i data-feather="info"></i> Заявки
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/partners' in request.get_full_path %} active{% endif %}"
+                       href="/lk/partners"><i data-feather="info"></i> Контрагенты
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link has-icon{% if 'lk/revise' in request.get_full_path %} active{% endif %}"
+                       href="/lk/revise"><i data-feather="info"></i> Сверка
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- /Sidebar body -->
+    </div>
+    <div class="main">
+        <div class="main-header">
+            <a class="nav-link nav-link-faded rounded-circle nav-icon" href="#" data-toggle="sidebar"><i
+                        data-feather="menu"></i></a>
+            <ul class="nav nav-circle ml-auto">
+                <li class="nav-item d-none d-sm-block"><a class="nav-link nav-link-faded nav-icon" href="" id="refreshPage"><i
+                data-feather="refresh-cw"></i></a></li>
+                <li class="nav-item dropdown ml-2">
+                    <a class="nav-link nav-link-faded rounded nav-link-img dropdown-toggle px-2" href="#"
+                       data-toggle="dropdown" data-display="static">
+                        <img src="/static/images/1.jpg" alt="Admin" class="rounded-circle mr-2">
+                        <span class="d-none d-sm-block">{% if user.first_name == '' %}{{ user.email }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right pt-0 overflow-hidden">
+                        <div class="media align-items-center bg-primary text-white px-4 py-3 mb-2">
+                            <img src="/static/images/1.jpg" alt="Admin" class="rounded-circle" width="50"
+                                 height="50">
+                            <div class="media-body ml-2 text-nowrap">
+                                <h6 class="mb-0">Admin</h6>
+                                <span class="text-gray-400 font-size-sm">Administrator</span>
+                            </div>
+                        </div>
+                        <a class="dropdown-item has-icon text-danger" href="/logout">
+                            <i class="mr-2" data-feather="log-out"></i>
+                            Выход</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="main-body">
+            <div class="block block-rounded">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+        feather.replace()
+    </script>
+    {% block scripts %}
+    {% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+<div class="card shadow-lg border-0 rounded-lg mt-10">
+    <div class="card-body">
+        <form action="{% url 'LK:lk_blacklist' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">Дата</label>
+                <input type="text" name="date" id="date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="storage_id">Заведение</label>
+                <select name="storage_id" id="storage_id" class="form-select" required>
+                    <option value="" disabled selected>Выберите</option>
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="photo">Фото</label>
+                <input type="file" name="photo" class="form-control" placeholder="Добавьте фото">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Добавить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            $('#date').datepicker();
+        })
+    </script>
+{% endblock %}

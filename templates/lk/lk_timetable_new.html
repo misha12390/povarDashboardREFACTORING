@@ -1,0 +1,62 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        Создание расписания
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:lk_timetable_new' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">Дата</label>
+                <input type="text" name="date" id="date" placeholder="Выберите дату" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="employee">Сотрудник</label>
+                <select name="employee" id="employee" class="form-select" required>
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="storage_id">Заведение</label>
+                <select name="storage_id" id="storage_id" class="form-select" required>
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="oklad">Оклад</label>
+                <input type="tel" name="oklad" id="oklad" class="form-select" required>
+            </div>
+            <div class="form-group">
+                <label for="position">Позиция</label>
+                <select name="position" id="position" required>
+                    <option value="Бармен основной">Бармен основной</option>
+                    <option value="Бармен усиление">Бармен усиление</option>
+                    <option value="Бармен вызывной">Бармен вызывной</option>
+                    <option value="Бармен стажер">Бармен стажер</option>
+                    <option value="Повар основной">Повар основной</option>
+                    <option value="Повар усиление">Повар усиление</option>
+                    <option value="Повар вызывной">Повар вызывной</option>
+                    <option value="Повар стажер">Повар стажер</option>
+                    <option value="Тех. служащий">Тех. служащий</option>
+                    <option value="Тех. служащий вызывной">Тех. служащий</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Создать</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function(){
+        $("#date").datepicker();
+    });
+</script>
+{% endblock %}

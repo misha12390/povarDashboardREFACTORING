@@ -1,0 +1,21 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-body">
+        <form action="{% url 'LK:cards_edit' %}?id={{ row.id }}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="cafe">Заведение</label>
+                <input type="text" name="cafe" id="cafe" placeholder="Выберите заведение" class="form-control" list="cafes" value="{{ row.cafe }}">
+                <datalist id="cafes">
+                    {% for storage in storages %}
+                        <option value="{{ storage.name }}">
+                    {% endfor %}
+                </datalist>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

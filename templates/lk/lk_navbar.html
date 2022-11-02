@@ -1,0 +1,191 @@
+
+<!--
+      <div id="layoutSidenav_nav">
+        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+            <div class="sb-sidenav-menu">
+                <div class="nav">
+                    <div class="sb-sidenav-menu-heading">Общее</div>
+                    <a class="nav-link" href="/povar/expenses">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Расходы
+                    </a>
+                    <a class="nav-link" href="/povar/expenses/types">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Расходы по типам
+                    </a>
+                    <div class="sb-sidenav-menu-heading">Открытия</div>
+                    <a class="nav-link" href="/povar/opens/expenses">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Расходы открытие КМР
+                    </a>
+                    <div class="sb-sidenav-menu-heading">Другое</div>
+                    <a class="nav-link" href="/povar/info/main/01/1">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Повар информация
+                    </a>
+                    <a class="nav-link" href="/povar/iiko">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        IIKO
+                    </a>
+                    <a class="nav-link" href="http://calendar.aleks421.beget.tech">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Календарь
+                    </a>
+                    <a class="nav-link" href="/bank/menu">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Банк
+                    </a>
+                    <a class="nav-link" href="/front/bars">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        Бары
+                    </a>
+                </div>
+            </div>
+            <div class="sb-sidenav-footer">
+                <div class="small">Вы вошли как:</div>
+                {{ user.username }}
+            </div>
+        </nav>
+    </div>
+-->
+
+<!--
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Хмельной повар</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarColor02">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/lk/money">Деньги
+              <span class="visually-hidden">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/lk/expenses">Расходы</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/lk/timetable">Расписание</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/lk/salary">Зарплата</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/lk/autosalary">Зарплата2</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Бары</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="/bar?code=f85eb2f7-0947-41ed-ae7d-a5cb5c120028">Гаражная</a>
+              <a class="dropdown-item" href="/bar?code=7d91394d-2381-40b4-b824-4b10e3440ca8">Невкипелого</a>
+              <a class="dropdown-item" href="/bar?code=f2229eb0-5988-43c0-8428-04dc128cf574">Черкасская</a>
+              <a class="dropdown-item" href="/bar?code=9af6b139-5e65-4a8c-aefd-b38151f538b7">Чекистов</a>
+              <a class="dropdown-item" href="/bar?code=efbe8fe0-5c38-44c1-b704-d24510d6ad82">Сормовская</a>
+              <a class="dropdown-item" href="/bar?code=c6cb2684-a325-4962-be44-dc439e320e6e">Есенина</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+-->
+  <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <div class="position-sticky pt-3">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="/lk/money">
+            <span data-feather="home"></span>
+            Деньги
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/expenses">
+            <span data-feather="file"></span>
+            Расходы
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/timetable">
+            <span data-feather="shopping-cart"></span>
+            Расписание
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/salary">
+            <span data-feather="users"></span>
+            Зарплата
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/employee">
+            <span data-feather="users"></span>
+            Сотрудники
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/salary/calculation">
+            <span data-feather="users"></span>
+            Расчет ЗП
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/salary/total_calculation">
+            <span data-feather="users"></span>
+            Расчет ЗП по заведению
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/lk/salary/employee_calculation">
+            <span data-feather="users"></span>
+            Расчет ЗП по сотруднику
+          </a>
+        </li>
+      </ul>
+
+      
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Бары</span>
+      </h6>
+      <ul class="nav flex-column mb-2">
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=f85eb2f7-0947-41ed-ae7d-a5cb5c120028">
+            <span data-feather="file-text"></span>
+            Гаражная
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=7d91394d-2381-40b4-b824-4b10e3440ca8">
+            <span data-feather="file-text"></span>
+            Невкипелого
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=f2229eb0-5988-43c0-8428-04dc128cf574">
+            <span data-feather="file-text"></span>
+            Черкасская
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=9af6b139-5e65-4a8c-aefd-b38151f538b7">
+            <span data-feather="file-text"></span>
+            Чекистов
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=efbe8fe0-5c38-44c1-b704-d24510d6ad82">
+            <span data-feather="file-text"></span>
+            Сормовская
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bar?code=c6cb2684-a325-4962-be44-dc439e320e6e">
+            <span data-feather="file-text"></span>
+            Есенина
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>

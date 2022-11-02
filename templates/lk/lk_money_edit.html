@@ -1,0 +1,25 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-header">
+        Редактирование
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:lk_money_edit' id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="morning">Касса утро</label>
+                <input type="text" name="morning" id="morning" placeholder="Введите остаток на утро" class="form-control" value="{{row.sum_cash_morning}}">
+            </div>
+            <div class="form-group">
+                <label for="end_day">Касса вечер</label>
+                <input type="tel" name="end_day" id="end_day" placeholder="Введите остаток на вечер" class="form-control" value="{{row.sum_cash_end_day}}">
+            </div>
+            <div class="form-group">
+                <label for="deposit">Депозит</label>
+                <input type="tel" name="deposit" id="deposit" placeholder="Введите остаток на вечер" class="form-control" value="{% if row.deposit is None %}0{% else %}{{row.deposit}}{% endif %}">
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+{% endblock %}

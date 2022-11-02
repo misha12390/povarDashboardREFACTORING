@@ -1,0 +1,144 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-body">
+        <form action="{% url 'LK:supplier_debt_pay' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Дата</th>
+                                <th>Завед</th>
+                                <th>№ накл</th>
+                                <th>Продукт</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                {% if ip is not None %}
+                                    {% if row.type == 0 %}
+                                        {% if row.supplier == supplier %}
+                                            {% for storage in storages %}
+                                                {% if row.storage_id == storage.id %}
+                                                    {% if ip in storage.yur_lico %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="[{{ row.id }}]" value="{{ row.sum }}" class="form-check"></td>
+                                                        <td>{{ row.date_at|date:'Y-m-d' }}</td>
+                                                        <td>
+                                                            {{ storage.small_name }}
+                                                        </td>
+                                                        <td>{{ row.num }}</td>
+                                                        <td>
+                                                            {% for product in products %}
+                                                                {% if product.id == row.product %}
+                                                                    {{ product.name }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td><b>{{ row.sum }}</b></td>
+                                                    </tr>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    {% if row.type == 0 %}
+                                        {% if row.supplier == supplier %}
+                                            <tr>
+                                                <td><input type="checkbox" name="[{{ row.id }}]" value="{{ row.sum }}" class="form-check"></td>
+                                                <td>{{ row.date_at|date:'Y-m-d' }}</td>
+                                                <td>
+                                                    {% for storage in storages %}
+                                                        {% if storage.id == row.storage_id %}
+                                                            {{ storage.small_name }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ row.num }}</td>
+                                                <td>
+                                                    {% for product in products %}
+                                                        {% if product.id == row.product %}
+                                                            {{ product.name }}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                                <td><b>{{ row.sum }}</b></td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th><b><span id="summa">0</span></b></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Дата оплаты</label>
+                <input type="text" id="date" name="date" class="form-control" placeholder="Выберите дату" value="{{ date }}">
+            </div>
+            <div class="form-group">
+                <label for="payer">Плательщик</label>
+                <select class="form-select" id="payer" name="payer">
+                    <option value="" selected>Выберите..</option>
+                    <option value="AleksLuginin">Лугинин</option>
+                    <option value="DenisYurievichHP">Лола</option>
+                    <option value="VovaMoskvichev">Москвичев</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fromtype">Тип оплаты</label>
+                <select class="form-select" id="fromtype" name="fromtype">
+                    <option value="" selected>Выберите..</option>
+                    <option value="Бизнес-карта">Бизнес-карта</option>
+                    <option value="Наличные со счета">Наличные со счета</option>
+                    <option value="Расчетный счет">Расчетный счет</option>
+                    <option value="Наличные">Наличные</option>
+                    <option value="Рабочая карта">Рабочая карта</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Оплатить</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function()
+        {
+            $('input[type="checkbox"]').change(function()
+            {
+                var total=0;
+                $(this).parents("tr").children("td").
+                find('input[type=checkbox]:checked').each(function(){
+                    total +=parseInt($(this).val());
+                    console.log(total)
+                    document.getElementById('summa').innerText = total
+                });
+
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $('#date').datepicker
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            Список отсутствующих карт:
+            {{ undefined_cards|linebreaksbr }}
+            <br>
+            <table class="table table-bordered table-hover">
+                {% for card in cards %}
+                    <tr>
+                        <td><a href="/lk/statement/cards/edit?id={{ card.id }}">{{ card.num }} ({{ card.cafe }} | {% if card.type == 1 %}Карта{% else %}Мерчант{% endif %})</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'LK:statement_cards' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="num">Последние 4 цифры карты (или мерчант)</label>
+                    <input type="text" id="num" name="num" class="form-control" placeholder="Введите последние 4 цифры карты">
+                </div>
+                <div class="form-group">
+                    <label for="text">К чему принадлежит эта карта(мерчант) (заведение, человек итд)</label>
+                    <input type="text" id="text" name="text" class="form-control" placeholder="Введите держателя карты">
+                </div>
+                <div class="form-group">
+                    <label for="type">Тип</label>
+                    <select id="type" name="type" class="form-select">
+                        <option value="1">Карта</option>
+                        <option value="2">Мерчант</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

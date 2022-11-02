@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Тип</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fine in fines %}
+                        <tr>
+                            <td>{{ fine.text }}</td>
+                            <td>{{ fine.sum }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <table class="table table-sm table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Сотрудник</th>
+                        <th>Штраф</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fine in finesDirectory %}
+                        <tr>
+                            <td>
+                                {% for employee in employees %}
+                                    {% if fine.employee_id == employee.id %}
+                                        {{ employee.fio }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for f in fines %}
+                                    {% if f.id == fine.fine_id %}
+                                        {{ f.text }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for f in fines %}
+                                    {% if f.id == fine.fine_id %}
+                                        {{ f.sum }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'LK:lk_fine_save' %}" method="post">
+                {% csrf_token %}
+                <label for="date">Дата</label>
+                <input type="text" name="date" id="date" placeholder="Выберите дату" class="form-control" required>
+                <br>
+                <label for="employee_id">Сотрудник</label>
+                <input name="employee_id" id="employee_id" list="employees" class="form-control" required placeholder="Выберите сотрудника" class="form-control" />
+                <datalist id="employees">
+                    {% for employee in employees %}
+                        <option value="{{ employee.id }} {{ employee.fio }}">
+                    {% endfor %}
+                </datalist>
+                <br>
+                <label for="fine">Выберите тип штрафа</label>
+                <select name="fine" id="fine" class="form-select">
+                    {% for fine in fines %}
+                        <option value="{{ fine.id }}">{{ fine.text }} - {{ fine.sum }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <button type="submit" class="btn btn-success">Выдать штраф</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'LK:lk_new_fine_save' %}" method="post">
+                {% csrf_token %}
+                <label for="text">Штраф</label>
+                <input type="text" name="text" id="text" class="form-control">
+                <br>
+                <label for="sum">Сумма</label>
+                <input type="tel" name="sum" id="sum" class="form-control">
+                <br>
+                <button type="submit" class="btn btn-success">Создать штраф</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function(){
+        $("#date").datepicker();
+    });
+</script>
+{% endblock %}

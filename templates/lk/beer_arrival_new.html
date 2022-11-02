@@ -1,0 +1,64 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-body">
+        <form action="{% url 'LK:arrivals_new' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date_at">Дата</label>
+                <input type="text" id="date_at" name="date_at" placeholder="Выберите дату" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="num">Номер накладной</label>
+                <input type="text" id="num" name="num" placeholder="Введите номер накладной" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="storage_id">Заведение</label>
+                <select id="storage_id" name="storage_id" class="form-select" required>
+                    <option value="" selected>Выберите..</option>
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="product">Продукт</label>
+                <select id="product" name="product" class="form-select" required>
+                    <option value="" selected>Выберите..</option>
+                    {% for product in products %}
+                        {% if product.product_category == 'Бар' or product.product_category == 'Пиво разливное' %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount">Количество товара</label>
+                <input class="form-control" id="amount" name="amount" placeholder="Укажите количество товара" required>
+            </div>
+            <div class="form-group">
+                <label for="sum">Сумма</label>
+                <input type="tel" id="sum" name="sum" class="form-control" placeholder="Введите сумму" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Оплачено</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="0" selected>Неоплачено</option>
+                    <option value="1">Оплачено</option>
+                    <option value="2">Оплачено БАР</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Добавить</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function (){
+            $('#date_at').datepicker();
+        });
+    </script>
+{% endblock %}

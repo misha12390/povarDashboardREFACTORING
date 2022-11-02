@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block title %}График{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <a href="/lk/timetable/new" class="btn btn-outline-dark"><i data-feather="plus-circle"></i> Создать новую запись</a><br><br>
+            <form action="{% url 'LK:lk_salary_calculation_update' %}">
+                <div class="form-group">
+                    <label for="month">Месяц</label>
+                    <select id="month" name="month" class="form-select">
+                        <option value="" selected>Выберите..</option>
+                        <option value="01">Январь</option>
+                        <option value="02">Февраль</option>
+                        <option value="03">Март</option>
+                        <option value="04">Апрель</option>
+                        <option value="05">Май</option>
+                        <option value="06">Июнь</option>
+                        <option value="07">Июль</option>
+                        <option value="08">Август</option>
+                        <option value="09">Сентябрь</option>
+                        <option value="10">Октябрь</option>
+                        <option value="11">Ноябрь</option>
+                        <option value="12">Декабрь</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-outline-dark">Обновить</button>
+                </div>
+            </form>
+            <br>
+            <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                <thead>
+                    <tr class="column-filter dt-column-filter">
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th><input type="text" class="form-control form-control-sm"></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>ФИО</th>
+                        <th>Заведение</th>
+                        <th>Позиция</th>
+                        <th>Оклад</th>
+                        <th>Процент</th>
+                        <th>Премия</th>
+                        <th>Итого</th>
+                        <th>Выручка</th>
+                        <th>Сумма для процента</th>
+                        <th>Процент барменов</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ row.date_at|date:"Y-m-d" }}</td>
+                        <td>
+                            {% for employee in employees %}
+                                        {% if employee.id == row.employee_id %}
+                                            {{ employee.fio }}
+                                        {% endif %}
+                                    {% endfor %}
+                        </td>
+                        <td>
+                            {% for storage in storages %}
+                                {% if storage.id == row.storage_id %}
+                                    {{ storage.name }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ row.position }}</td>
+                        <td>{{ row.oklad }}</td>
+                        <td>{% if row.precent is None %}0{% else %}{{ row.precent }}{% endif %}</td>
+                        <td>{% if row.premium is None %}0{% else %}{{ row.premium }}{% endif %}</td>
+                        <td>{% if row.total is None %}0{% else %}{{ row.total }}{% endif %}</td>
+                        <td>{{ row.payorders }}</td>
+                        <td>{{ row.sumforprecent }}</td>
+                        <td>{{ row.precent_num }}</td>
+                        <td><a href="/lk/timetable/edit/{{row.id}}"><i data-feather="settings"></i></a><a data-bs-toggle="modal" data-bs-target="#exampleModal{{ row.id }}"><i data-feather="x-circle"></i></a></td>
+                        <div class="modal fade" id="exampleModal{{ row.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ row.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel{{ row.id }}">Подтверждение</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Вы действительно хотите удалить запись?</p>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                <a href="/lk/timetable/delete/{{ row.id }}" class="btn btn-danger">Удалить</a>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            },
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3, 4, 5, 6, 7, 8], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            "order": [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(7, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(7).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(4, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(4).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(5, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(5).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(6, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(6).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+{% endblock %}

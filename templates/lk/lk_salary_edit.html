@@ -1,0 +1,95 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-header">
+        Редактирование записи
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:lk_salary_edit' id %}"
+            method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="employee_id">Сотрудник</label>
+                <select name="employee_id" id="employee_id" class="form-select">
+                    <option value="" disabled>Выберите..</option>
+                    {% for employee in employees %}
+                        {% if row.employee_id == employee.id %}
+                            <option value="{{ row.employee_id }}" selected>{{ employee.fio }}</option>
+                        {% else %}
+                            <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="type">Тип зарплаты</label>
+                <select name="type" id="type" class="form-select">
+                    <option value="" disabled>Выберите..</option>
+                    
+                    {% if row.type == 'Аванс' %}
+                    <option value="Аванс" selected>Аванс</option>
+                    <option value="Зарплата">Зарплата</option>
+                    {% else %}
+                    <option value="Аванс">Аванс</option>
+                    <option value="Зарплата" selected>Зарплата</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="storage_id">Заведение</label>
+                <select name="storage_id" id="storage_id" class="form-select">
+                    <option value="" disabled>Выберите..</option>
+                    {% for storage in storages %}
+                        {% if row.storage_id == storage.id %}
+                            <option value="{{ row.storage_id }}" selected>{{ storage.name }}</option>
+                        {% else %}
+                            <option value="{{ row.storage_id }}">{{ storage.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="oklad">Оклад</label>
+                <input type="tel" name="oklad" id="oklad" class="form-control" placeholder="Введите оклад" value="{{ row.sum }}"><br>
+            </div>
+            {% if row.type == 'Зарплата' %}{{ row.sum_taxi }}{% endif %}
+            <div class="form-group" {% if row.type == 'Зарплата' %}{% else %}style="display: none;"{% endif %}>
+                <label for="days">Срок</label>
+                <select name="days" id="days" class="form-select">
+                    <option value="a" selected>Выберите срок</option>
+                    <option value="1 - 15 числа">1 - 15</option>
+                    <option value="16 - 31 числа">16 - 31</option>
+                </select>
+            </div>
+            <div class="form-group" {% if row.type == 'Зарплата' %}{% else %}style="display: none;"{% endif %}>
+                <label for="month">Месяц</label>
+                <select name="month" id="month" class="form-select" {% if row.type == 'Зарплата' %}{% else %}style="display: none;"{% endif %}>
+                    <option value="a" selected>Выберите..</option>
+                    <option value="Январь">Январь</option>
+                    <option value="Февраль">Февраль</option>
+                    <option value="Март">Март</option>
+                    <option value="Апрель">Апрель</option>
+                    <option value="Май">Май</option>
+                    <option value="Июнь">Июнь</option>
+                    <option value="Июль">Июль</option>
+                    <option value="Август">Август</option>
+                    <option value="Сентябрь">Сентябрь</option>
+                    <option value="Октябрь">Октябрь</option>
+                    <option value="Ноябрь">Ноябрь</option>
+                    <option value="Декабрь">Декабрь</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="precent">Процент</label>
+                <input type="tel" name="precent" id="precent" class="form-control" placeholder="Введите процент" value="{% if row.sum_percent is None %}0{% else %}{{ row.sum_percent }}{% endif %}">
+            </div>
+            <div class="form-group">
+                <label for="premium">Премия</label>
+                <input type="tel" name="premium" id="premium" class="form-control" placeholder="Введите премию" value="{% if row.premium is None %}0{% else %}{{ row.premium }}{% endif %}">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+        </form>
+    </div>
+{% endblock %}

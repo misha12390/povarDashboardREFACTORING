@@ -1,0 +1,50 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-header">
+        Редактирование записи
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:lk_pays_edit' id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">Дата</label>
+                <input type="text" name="date" id="date" value="{{ row.date_at }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="type">Тип</label>
+                <select class="form-select" name="type" id="type">
+                    <option value="1" {% if row.type == 1 %}selected{% endif %}>Внесение</option>
+                    <option value="2" {% if row.type == 2 %}selected{% endif %}>Изъятие</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="comment">Комментарий</label>
+                <select id="comment" name="comment" class="form-select">
+                    {% for record in records %}
+                        {% if record.text == row.comment %}
+                            <option value="{{ row.comment }}" selected>{{ row.comment }}</option>
+                        {% else %}
+                            <option value="{{ record.text }}">{{ record.text }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sum">Сумма</label>
+                <input class="form-control" id="sum" name="sum" value="{{ row.sum }}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function() {
+            $('#date_at').datepicker()
+        })
+    </script>
+{% endblock %}

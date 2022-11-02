@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <div class="list-with-gap">
+                <a href="/lk/supplier_debt" class="btn btn-success">Главная</a>
+                {% for storage in storages %}
+                    <a href="/lk/supplier_debt?storage_id={{ storage.id }}" class="{% if '{{ storage.id }}' in request.get_full_path %}btn btn-primary{% else %}btn btn-secondary{% endif %}">{{ storage.name }}</a>
+                {% endfor %}
+                <a href="/lk/supplier_debt?storage_id=luginin" class="btn btn-secondary">ИП Лугинин</a>
+                <a href="/lk/supplier_debt?storage_id=moskvichev" class="btn btn-secondary">ИП Москвичев</a>
+            </div><br><br>
+            <b>{{ storage_name }}</b><br>
+            <form action="{% url 'LK:supplier_debt' %}">
+                {% if storage_id is not None %}
+                    <input type="hidden" name="storage_id" value="{{ storage_id }}">
+                {% endif %}
+                <input type="text" id="dateFrom" name="dateFrom" class="form-control-sm" value="{{ dateFrom }}" required> <input type="text" id="dateTo" name="dateTo" value="{{ dateTo }}" class="form-control-sm" required> <button type="submit" class="btn btn-success">Применить</button>
+            </form>
+            <div class="table-responsive">
+                <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Поставщик</th>
+                            <th>Итого</th>
+                            <th>Опл</th>
+                            <th>Неопл</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'id' %}
+                                            {% for supplier in suppliers %}
+                                                {% if value == supplier.supplier_id %}
+                                                    <a href="/lk/supplier_debt?supplier_id={{ supplier.id }}">{{ supplier.friendly_name }}</a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'total' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'paid' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'unpaid' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'id' %}
+                                            <a data-bs-toggle="modal" data-bs-target="#exampleModal{{ value }}">
+                                                <i data-feather="credit-card"></i>
+                                            </a>
+                                            <div class="modal fade" id="exampleModal{{ value }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ value }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <form action="{% url 'LK:supplier_debt' %}" method="post">
+                                                            {% csrf_token %}
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel{{ value }}">Выберите накладные для оплаты</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="form-group">
+                                                                        <div class="table-responsive">
+                                                                            <table class="table table-sm table-hover">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th></th>
+                                                                                        <th>Дата</th>
+                                                                                        <th>Завед</th>
+                                                                                        <th>№ накл</th>
+                                                                                        <th>Продукт</th>
+                                                                                        <th>Сумма</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {% for row in rows %}
+                                                                                        {% if ip is not None %}
+                                                                                            {% if row.type == 0 %}
+                                                                                                {% if row.supplier == value %}
+                                                                                                    {% for storage in storages %}
+                                                                                                        {% if row.storage_id == storage.id %}
+                                                                                                            {% if ip in storage.yur_lico %}
+                                                                                                            <tr>
+                                                                                                                <td><input type="checkbox" name="[{{ row.id }}]" value="{{ row.sum }}" class="form-check"></td>
+                                                                                                                <td>{{ row.date_at|date:'Y-m-d' }}</td>
+                                                                                                                <td>
+                                                                                                                    {{ storage.small_name }}
+                                                                                                                </td>
+                                                                                                                <td>{{ row.num }}</td>
+                                                                                                                <td>
+                                                                                                                    {% for product in products %}
+                                                                                                                        {% if product.id == row.product %}
+                                                                                                                            {{ product.name }}
+                                                                                                                        {% endif %}
+                                                                                                                    {% endfor %}
+                                                                                                                </td>
+                                                                                                                <td><b>{{ row.sum }}</b></td>
+                                                                                                            </tr>
+                                                                                                            {% endif %}
+                                                                                                        {% endif %}
+                                                                                                    {% endfor %}
+                                                                                                {% endif %}
+                                                                                            {% endif %}
+                                                                                        {% else %}
+                                                                                            {% if row.type == 0 %}
+                                                                                                {% if row.supplier == value %}
+                                                                                                    <tr>
+                                                                                                        <td><input type="checkbox" name="[{{ row.id }}]" value="{{ row.sum }}" class="form-check"></td>
+                                                                                                        <td>{{ row.date_at|date:'Y-m-d' }}</td>
+                                                                                                        <td>
+                                                                                                            {% for storage in storages %}
+                                                                                                                {% if storage.id == row.storage_id %}
+                                                                                                                    {{ storage.small_name }}
+                                                                                                                {% endif %}
+                                                                                                            {% endfor %}
+                                                                                                        </td>
+                                                                                                        <td>{{ row.num }}</td>
+                                                                                                        <td>
+                                                                                                            {% for product in products %}
+                                                                                                                {% if product.id == row.product %}
+                                                                                                                    {{ product.name }}
+                                                                                                                {% endif %}
+                                                                                                            {% endfor %}
+                                                                                                        </td>
+                                                                                                        <td><b>{{ row.sum }}</b></td>
+                                                                                                    </tr>
+                                                                                                {% endif %}
+                                                                                            {% endif %}
+                                                                                        {% endif %}
+                                                                                    {% endfor %}
+                                                                                </tbody>
+                                                                                <tfoot>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                                    <th></th>
+                                                                                    <th><div class="summa">0</div></th>
+                                                                                </tfoot>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="date">Дата оплаты</label>
+                                                                        <input type="text" id="date" name="date" class="form-control" placeholder="Выберите дату" value="{{ date }}">
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="payer">Плательщик</label>
+                                                                        <select class="form-select" id="payer" name="payer">
+                                                                            <option value="" selected>Выберите..</option>
+                                                                            <option value="AleksLuginin">Лугинин</option>
+                                                                            <option value="DenisYurievichHP">Лола</option>
+                                                                            <option value="VovaMoskvichev">Москвичев</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label for="fromtype">Тип оплаты</label>
+                                                                        <select class="form-select" id="fromtype" name="fromtype">
+                                                                            <option value="" selected>Выберите..</option>
+                                                                            <option value="Бизнес-карта">Бизнес-карта</option>
+                                                                            <option value="Наличные со счета">Наличные со счета</option>
+                                                                            <option value="Расчетный счет">Расчетный счет</option>
+                                                                            <option value="Наличные">Наличные</option>
+                                                                            <option value="Рабочая карта">Рабочая карта</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                                                <button type="submit" class="btn btn-success">Оплатить</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script>
+                                            $(document).ready(function()
+                                            {
+
+                                                $('input[type="checkbox"]').change(function()
+                                                {
+                                                    var total=0;
+                                                    $(this).parents("tr").children("td").
+                                                    find('input[type=checkbox]:checked').each(function(){
+                                                        total +=parseInt($(this).val());
+                                                    });
+                                                    console.log(total)
+                                                    $("#exampleModal{{ value }} .modal-body .summa").text(total);
+                                                });
+                                            });
+                                            </script>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <br>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="table_id2" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>Поставщик</th>
+                            <th>Итого</th>
+                            <th>Опл</th>
+                            <th>Неопл</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records2 %}
+                            <tr>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'id' %}
+                                            {% for supplier in suppliers %}
+                                                {% if value == supplier.supplier_id %}
+                                                    {{ supplier.friendly_name }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'total' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'paid' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for key, value in record.items %}
+                                        {% if key == 'unpaid' %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            },
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3, 4], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(2, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(2).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(3, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(3).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(1, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(1).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id2').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            },
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(2, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(2).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(3, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(3).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(1, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(1).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+    })
+</script>
+
+<script>
+    $(function() {
+        $('#dateTo').datepicker();
+        $('#dateFrom').datepicker();
+        $('#date').datepicker();
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i> Внесения/изъятия
+        </div>
+        <div class="card-body">
+            <a href="/lk/pays/new" class="btn btn-primary">Добавить запись</a><br>
+            <div class="table-responsive">
+                <table id="table_id" class="table table-hover my-0 table-striped table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Тип</th>
+                            <th>Заведение</th>
+                            <th>Комментарий</th>
+                            <th>Сумма</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm"></th>
+                            <th><input type="text" class="form-control form-control-sm"></th>
+                            <th><input type="text" class="form-control form-control-sm"></th>
+                            <th><input type="text" class="form-control form-control-sm"></th>
+                            <th><input type="text" class="form-control form-control-sm"></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row.date_at }}</td>
+                            <td>{{ row.type }}</td>
+                            <td>
+                                {% for storage in storages %}
+                                    {% if storage.id == row.storage_id %}
+                                        {{ storage.name }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ row.comment }}</td>
+                            <td>{{ row.sum }}</td>
+                                <td>
+                                    <a href="/lk/pays/edit/{{ row.id }}"><i data-feather="edit"></i></a>
+                                    <a data-bs-toggle="modal" data-bs-target="#exampleModal{{ row.id }}"><i data-feather="x-circle"></i></a>
+                                </td>
+                                    <div class="modal fade" id="exampleModal{{ row.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ row.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel{{ row.id }}">Подтверждение</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Вы действительно хотите удалить запись?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                            <a href="/bar/info/pays/delete?id={{ row.id }}" class="btn btn-danger">Удалить</a>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            },
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3, 4, 5], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            "order": [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(4, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(4).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+{% endblock %}

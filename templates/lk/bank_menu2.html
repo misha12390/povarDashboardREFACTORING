@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <a href="/lk/statement?full=1" class="btn btn-sm btn-success">Полная выписка</a>
+            <br> <br>
+            <form action="{% url 'LK:bank_parser' %}" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file">
+                {% csrf_token %}
+                <input type="submit" value="Загрузить">
+            </form>
+            <div class="table-responsive">
+                <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Дата документа</th>
+                            <th>Номер</th>
+                            <th>Приход</th>
+                            <th>Расход</th>
+                            <th>Заведение</th>
+                            <th>Реальная дата</th>
+                            <th>Тип расхода</th>
+                            <th>Плательщик</th>
+                            <th>Получатель</th>
+                            <th>Комментарий</th>
+                            <th>Платеж</th>
+                            <th>Плательщик</th>
+                            <th>Получатель</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in rows %}
+                            {% for card in cards %}
+                                {% if card.id == data.card_id %}
+                                    {% if card.storage_id != -1 %}
+                                        <tr>
+                                            <td>{{ data.date_at }}</td>
+                                            <td>{{ data.number }}</td>
+                                            <td>
+                                                {% for recipient in partners %}
+                                                    {% if recipient.id == data.recipient_id %}
+                                                        {% if recipient.status == 1 %}
+                                                            {{ data.sum }}
+                                                        {% else %}
+                                                            0
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% for recipient in partners %}
+                                                    {% if recipient.id == data.recipient_id %}
+                                                        {% if recipient.status == 0 %}
+                                                            -{{ data.sum }}
+                                                        {% else %}
+                                                            0
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {{card.cafe}}
+                                            </td>
+                                            <td>{{ data.date }}</td>
+                                            <td>
+                                                {% for recipient in partners %}
+                                                    {% if recipient.id == data.recipient_id %}
+                                                        {{recipient.type}}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% for payer in partners %}
+                                                    {% if payer.id == data.payer_id %}
+                                                        {{ payer.friendly_name }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% for recipient in partners %}
+                                                    {% if recipient.id == data.recipient_id %}
+                                                        {{ recipient.friendly_name }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ data.comment }}</td>
+                                            <td>{{ data.payment }}</td>
+                                            <td>
+                                                {% for payer in partners %}
+                                                    {% if payer.id == data.payer_id %}
+                                                        {{ payer.name }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% for recipient in partners %}
+                                                    {% if recipient.id == data.recipient_id %}
+                                                        {{ recipient.name }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td><a href="/lk/statement/edit?id={{ data.id }}"><i data-feather="edit"></i></a></td>
+                                        </tr>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+            <p><a href="/lk/statement/cards" class="btn btn-outline-primary">Карты</a></p>
+            <p><a href="/lk/statement/cards/sum" class="btn btn-outline-primary">Суммы по картам</a></p>
+            <p><a href="/lk/statement/update/card" class="btn btn-outline-primary">Обновить карточки</a></p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="table_id2" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                        </tr>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Точка</th>
+                            <th>Сумма выписка</th>
+                            <th>Сумма безнал</th>
+                            <th>Разница</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            {% if record.storageName is not None %}
+                                <tr>
+                                    <td>{{ record.date }}</td>
+                                    <td>{{ record.storageName }}</td>
+                                    <td>{{ record.statmentSum }}</td>
+                                    <td>{% if record.transSum is None %}0{% else %}{{ record.transSum }}{% endif %}</td>
+                                    {% if record.transSum is None %}<td class="table-danger">0</td>{% else %}<td>{{ record.diffSum }}</td>{% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3, 4, 5, 6, 7], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            "order": [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(2, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(2).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(3, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(3).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id2').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            responsive: true,
+            'columnDefs': [{
+                'targets': [0, 1, 2, 3, 4], /* column index */
+                'orderable': false, /* true or false */
+            }],
+            "order": [[0, "desc"]],
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                pageTotal4 = api.column(2, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(2).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(3, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(3).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+                pageTotal4 = api.column(4, { page: 'current' }).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+                // Update footer
+                $(api.column(4).footer()).html(
+                    '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                );
+            }
+
+        })
+        // Apply column filter
+        $('#table_id2 .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+{% endblock %}

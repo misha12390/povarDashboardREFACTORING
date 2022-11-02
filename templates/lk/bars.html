@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            {% for storage in storages %}
+                {% if storage.id != 100 %}
+                    <div class="divider-text"></div>
+                    <a href="/bar?code={{ storage.code }}">{{ storage.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

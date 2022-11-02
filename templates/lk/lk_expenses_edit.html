@@ -1,0 +1,60 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-header">
+        Создание расхода
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:lk_expenses_edit' id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date">Дата</label>
+                <input type="text" name="date" id="date" placeholder="Выберите дату" class="form-control" value="{{row.date_at|date:'Y-m-d'}}">
+            </div>
+            <div class="form-group">
+                <label for="sum">Сумма</label>
+                <input type="tel" name="sum" id="sum" placeholder="Введите сумму" class="form-control" value="{{row.sum}}">
+            </div>
+            <div class="form-group">
+                <label for="storage">Заведение</label>
+                <select name="storage" id="storage" class="form-select">
+                    {% for storage in storages %}
+                        {% if storage.id == row.storage_id %}
+                            <option value="{{ storage.id }}" selected>{{ storage.name }}</option>
+                        {% else %}
+                            <option value="{{storage.id}}">{{storage.name}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pay_type">Тип оплаты</label>
+                <select name="pay_type" id="pay_type" class="form-select">
+                    {% if row.is_bn == 0 %}
+                        <option value="0" selected>Из кассы</option>
+                    {% else %}
+                        <option value="0">Из кассы</option>
+                    {% endif %}
+                    {% if row.is_bn == 1 %}
+                        <option value="1" selected>Картой</option>
+                    {% else %}
+                        <option value="1">Картой</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="comment">Комментарий</label>
+                <input type="text" id="comment" name="comment" class="form-control" value="{{row.comment}}">
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function(){
+        $("#date").datepicker();
+    });
+</script>
+{% endblock %}
