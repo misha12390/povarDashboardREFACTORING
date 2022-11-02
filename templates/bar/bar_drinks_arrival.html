@@ -1,0 +1,72 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <td>Номер накладной</td>
+                            <td>Продукт</td>
+                            <td>Кол-во</td>
+                            <td>Сумма</td>
+                            <td>Статус</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.num }}</td>
+                                <td>
+                                    {% for product in products %}
+                                        {% if product.id == row.product %}
+                                            {{ product.name }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ row.amount }}</td>
+                                <td>{{ row.sum }}</td>
+                                <td>{% if row.type == 0 %}<span class="badge bg-danger">Неоплачено</span>{% else %}<span class="badge bg-success">Оплачено</span>{% endif %}</td>
+                                <td><a href="/bar/arrival/drinks/delete?code={{ code }}&id={{ row.id }}"><i data-feather="x-circle"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <form action="{% url 'Bar:bar_drinks_arrival' %}?code={{ code }}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="code" value="{{ code }}">
+                <div class="form-group">
+                    <label for="num">Номер накладной</label>
+                    <input type="text" id="num" name="num" class="form-control" placeholder="Введите номер накладной" required>
+                </div>
+                <div class="form-group">
+                    <label for="beer">Товар</label>
+                    <select class="form-select" id="beer" name="beer" required>
+                        <option value="" selected>Выберите..</option>
+                        {% for beer in beers %}
+                            <option value="{{ beer.id }}">{{ beer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Количество</label>
+                    <input type="tel" id="amount" name="amount" class="form-control" placeholder="Введите количество получаемого товара" required>
+                </div>
+                <div class="form-group">
+                    <label for="sum">Сумма</label>
+                    <input type="tel" id="sum" name="sum" class="form-control" placeholder="Введите сумму накладной" required>
+                </div>
+                <div class="form-group">
+                    <label for="typeOpl">Оплачено</label>
+                    <input type="checkbox" name="typeOpl" class="form-check">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

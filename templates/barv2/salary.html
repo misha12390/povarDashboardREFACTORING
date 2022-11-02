@@ -1,0 +1,59 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-5">
+    <div class="card-header">
+        <b>Зарплата (выплачено: {% if salary_sum is None %}0{% else %}{{ salary_sum }}{% endif %})</b>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <th>ФИО</th>
+                <th>Оклад</th>
+                <th>Процент</th>
+                <th>Премия</th>
+                <th>Итого</th>
+            </thead>
+            <tbody>
+                {% for salary in salaries %}
+                    <tr>
+                        <td>
+                            {% for employee in employees %}
+                                {% if salary.employee_id == employee.id %}
+                                    {{ employee.fio }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ salary.oklad }}</td>
+                        <td>{{ salary.percent }}</td>
+                        <td>{{ salary.premium }}</td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <form action="{% url 'Bar:salary_save' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="code" id="code" value="{{ code }}">
+            <table>
+                {% for t in timetable %}
+                    <tr>
+                        <td>{% for employee in employees %}{% if employee.id == t.employee_id %}{{ employee.fio }}{% endif %}{% endfor %}: </td>
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][oklad]" name="[{{t.employee_id}}][oklad]" placeholder="Оклад"></td>
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][percent]" name="[{{t.employee_id}}][percent]" placeholder="Процент"></td>
+                        {% if 'вызывной' in t.position %}
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][premium]" name="[{{t.employee_id}}][premium]" placeholder="Премия"></td>
+                        {% else %}
+                        <td><input type="hidden" class="form-control" id="[{{t.employee_id}}][premium]" name="[{{t.employee_id}}][premium]" placeholder="Премия"></td>
+                        {% endif %}
+                        <input type="hidden" name="employee_id[{{ t.employee_id }}]" id="employee_id[{{ t.employee_id }}]" value="{{ t.employee_id }}">
+                    </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

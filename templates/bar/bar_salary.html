@@ -1,0 +1,67 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-header">
+        <b>Зарплата (выплачено: {% if salary_sum == None %}0{% else %}{{ salary_sum }}{% endif %})</b>
+    </div>
+    <div class="card-body">
+        {% if warning is not None %}
+            {% if warning == '1' %}
+                <div class="alert alert-danger" role="alert">
+                    <i data-feather="alert-triangle"></i> Данный сотрудник уже получил зарплату на другом заведении
+                </div>
+            {% endif %}
+        {% endif %}
+        <table class="table table-sm">
+            <thead>
+                <th>ФИО</th>
+                <th>Оклад</th>
+                <th>Процент</th>
+                <th>Премия</th>
+                <th>Итого</th>
+            </thead>
+            <tbody>
+                {% for salary in salaries %}
+                    <tr>
+                        <td>
+                            {% for employee in employees %}
+                                {% if salary.employee_id == employee.id %}
+                                    {{ employee.fio }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>{{ salary.sum }}</td>
+                        <td>{{ salary.sum_percent }}</td>
+                        <td>{{ salary.premium }}</td>
+                        <td>{{ salary.itogo }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <form action="{% url 'Bar:bar_salary_save' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="cafe" id="cafe" value="{{ storage_id }}">
+            <input type="hidden" name="code" id="code" value="{{ code }}">
+            <table>
+                {% for t in timetable %}
+                    <tr>
+                        <td>{% for employee in employees %}{% if employee.id == t.employee_id %}{{ employee.fio }}{% endif %}{% endfor %}: </td>
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][oklad]" name="[{{t.employee_id}}][oklad]" placeholder="Оклад"></td>
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][precent]" name="[{{t.employee_id}}][precent]" placeholder="Процент"></td>
+                        {% if 'вызывной' in t.position %}
+                        <td><input type="tel" class="form-control" id="[{{t.employee_id}}][premium]" name="[{{t.employee_id}}][premium]" placeholder="Премия"></td>
+                        {% else %}
+                        <td><input type="hidden" class="form-control" id="[{{t.employee_id}}][premium]" name="[{{t.employee_id}}][premium]" placeholder="Премия"></td>
+                        {% endif %}
+                        <input type="hidden" name="employee_id[{{ t.employee_id }}]" id="employee_id[{{ t.employee_id }}]" value="{{ t.employee_id }}">
+                    </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+    <div class="card shadow-lg border-0 rounded-lg mt-0">
+        <div class="card-header">
+            <b>Расходы {% if expenses_sum is None %}0{% else %}{{ expenses_sum }}{% endif %} ({% if all_expenses_nal is None %}0{% else %}{{ all_expenses_nal }}{% endif %}+{% if all_expenses_card is None %}0{% else %}{{ all_expenses_card }}{% endif %})</b>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <th>Расход</th>
+                    <th>Комментарий</th>
+                    <th>Сумма</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense.expense }} ({% if expense.is_bn == 0 %}Из кассы{% else %}Картой{% endif %})</td>
+                            <td>{{ expense.comment }}</td>
+                            <td>{{ expense.sum }}</td>
+                            <td>
+                                <a data-bs-toggle="modal" data-bs-target="#exampleModal{{ expense.id }}">
+                                    <i data-feather="x-circle"></i>
+                                </a>
+                            </td>
+                            <div class="modal fade" id="exampleModal{{ expense.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ expense.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel{{ expense.id }}">Вы действительно хотите удалить расход?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>{{ expense.expense }} ({% if expense.is_bn == 0 %}Из кассы{% else %}Картой{% endif %}) - {{ expense.sum }}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                    <a href="/bar/expenses/delete/{{ expense.id }}" class="btn btn-danger">Удалить</a>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <form action="{% url 'Bar:bar_expenses_save' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="code" id="code" value="{{ code }}">
+                <select name="pay_type" id="pay_type" class="form-select" required>
+                    <option value="" selected="">Тип оплаты</option>
+                    <option value="0">Из кассы</option>
+                    <option value="1">Картой</option>
+                </select>
+                <br>
+                <table>
+                    {% for row in rows %}
+                        {% if row.text == 'Такси' %}
+                            <tr>
+                                <td>Такси</td>
+                                <td>
+                                    <select name="taxi_comment" id="taxi_comment" class="form-select">
+                                        <option value="" selected id="option" name="option">Выберите..</option>
+                                        {% for t in timetable %}
+                                            {% for employee in employees %}
+                                                {% if t.employee_id == employee.id %}
+                                                    <option value="{{ employee.fio }}">{{ employee.fio }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td><input type="tel" name="taxi_sum" id="taxi_sum" value="" placeholder="Сумма" class="form-control" onkeyup="getValue()"></td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>{{ row.text }}</td>
+                                <td><input type="text" name="{{ row.input_name }}_comment" id="{{ row.input_name }}_comment" value="" placeholder="Комментарий" class="form-control"></td>
+                                <td><input type="tel" name="{{ row.input_name }}_sum" id="{{ row.input_name }}_sum" value="" placeholder="Сумма" class="form-control"></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+                <br>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <div class="card shadow-lg border-0 rounded-lg mt-4">
+        <div class="card-header">
+            <b>Внесение/Изъятие ({% if all_pays is None %}0{% else %}{{ all_pays }}{% endif %})</b>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover my-0 table-sm">
+                <thead>
+                    <th>Вид</th>
+                    <th>Комментарий</th>
+                    <th>Сумма</th>
+                </thead>
+                <tbody>
+                    {% for pay in pays %}
+                        <tr>
+                            <td>
+                                {% if pay.type == 2 %}
+                                    Изъятие
+                                {% else %}
+                                    Внесение
+                                {% endif %}
+                            </td>
+                            <td>{{ pay.comment }}</td>
+                            <td>{{ pay.sum }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <form action="{% url 'Bar:bar_pays_save' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="code" id="code" value="{{ code }}">
+                <table>
+                    <tr>
+                        <td>Внесение:</td>
+                        <td>
+                            <select name="payin_comment" id="payin_comment" class="form-select">
+                                <option value="" selected="">Выберите..</option>
+                                {% for d in data %}
+                                    <option value="{{ d.text }}">{{ d.text }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input value="" type="tel" name="payin_sum" id="payin_sum" placeholder="Сумма" class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <td>Изъятие:</td>
+                        <td>
+                            <select name="payout_comment" id="payout_comment" class="form-select">
+                                <option value="" selected="">Выберите..</option>
+                                {% for d in data %}
+                                    {% if d.text != 'Масло' %}
+                                        <option value="{{ d.text }}">{{ d.text }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input value="" type="tel" name="payout_sum" id="payout_sum" placeholder="Сумма" class="form-control"></td>
+                    </tr>
+                </table>
+                <br>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </form>
+        </div>
+    </div><br>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function getValue() {
+            var select = document.getElementById('taxi_sum');
+            var value = select.value;
+            if(value != '') {
+                document.getElementById('taxi_comment').setAttribute('required', '')
+                document.getElementById('option').setAttribute('disabled', '')
+            }
+            else if(value == '') {
+                document.getElementById('taxi_comment').removeAttribute('required')
+                document.getElementById('option').removeAttribute('disabled')
+            }
+        }
+    </script>
+{% endblock %}

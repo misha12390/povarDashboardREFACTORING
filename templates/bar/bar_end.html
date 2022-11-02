@@ -1,0 +1,75 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-header">
+        <b>Конец дня (№: {{ sessionId }})</b>
+    </div>
+    <div class="card-body">
+        {% if openDate is not None %}
+        Открыта: {{ openDate }} <br>
+        {% endif %}
+        {% if closeDate is not None %}
+        Закрыта: {{ closeDate }} <br>
+        {% endif %}
+        <div class="dropdown-divider"></div>
+        Выручка: {{ payOrders }} <br>
+        {% if sumNal > 0 %}
+        Наличные: {{ sumNal }} ({{ nal }} + {{ nal_point }}) <br>
+        {% endif %}
+        {% if sumBN > 0 %}
+        Банковская карта(авт.ч): {{ sumBN }} <br>
+        {% endif %}
+        {% if yandex > 0 %}
+        Яндекс ЕДА: {{ yandex }} <br>
+        {% endif %}
+        {% if delivery > 0 %}
+        Деливери: {{ delivery }} <br>
+        {% endif %}
+        {% if sum_for_percent > 0 %}
+        Сумма для начисления процентов: {{ sum_for_percent }} <br>
+        {% endif %}
+        <div class="dropdown-divider"></div>
+        Касса утро: {{ morning }} <br>
+        {% if sumNal > 0 %}
+        Наличные: {{ sumNal }} ({{ nal }} + {{ nal_point }}) <br>
+        {% endif %}
+        {% if expensesNal > 0 %}
+        Расходы нал: {{ expensesNal }} <br>
+        {% endif %}
+        {% if monthly_salary > 0 %}
+        ЗП расчет: {{ monthly_salary }} <br>
+        {% endif %}
+        {% if total_salary > 0 %}
+        ЗП Аванс: {{ total_salary }} <br>
+        {% endif %}
+        {% if payin > 0 %}
+        Внесения: {{ payin }} <br>
+        {% endif %}
+        {% if payout > 0 %}
+        Изъятия: {{ payout }} <br>
+        {% endif %}
+        <form action="{% url 'Bar:bar_end_save' %}" method="post">
+            {% csrf_token %}
+            {% if end is None or end == '' %}
+                {% if closeDate is not None %}
+                <br>
+                <input type="hidden" name="sumNal" value="{{ sumNal }}">
+                <input type="hidden" name="code" value="{{ code }}">
+                <input type="hidden" name="sumBN" value="{{ sumBN }}">
+                <input type="hidden" name="total_day" value="{{ payOrders }}">
+                <input type="hidden" name="yandex" value="{{ yandex }}">
+                <input type="hidden" name="delivery" value="{{ delivery }}">
+                <label for="cash">Остаток наличных в кассе</label>
+                <input type="tel" id="cash" name="cash" class="form-control" placeholder="Пересчитайте остатки в кассе"> <br>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+                {% endif %}
+            {% else %}
+            <div class="dropdown-divider"></div>
+            Остаток в кассе: {{ end }} <br> Расхождение: {{ difference }}
+            Расчетный: {{ calculated }}
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

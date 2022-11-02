@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'IIKO:inventory' %}">
+                <label for="storage_id">Заведение</label>
+                <select class="form-select" id="storage_id" name="storage_id">
+                    <option value="0" selected>Все</option>
+                    {% for storage in storages %}
+                        <option value="{{ storage.id }}">{{ storage.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="category">Категория</label>
+                <select class="form-select" id="category" name="category">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <button type="submit" class="btn btn-success">Применить фильтр</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+            {% if storage_id == 0 %}
+                <b>Все</b>
+                <div class="table-responsive">
+                    <table id="table_id" class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Заведение</th>
+                                {% for product in products %}
+                                    <th>{{ product.name }}</th>
+                                {% endfor %}
+                                <th>Итого</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                                {% for key, value in row.items %}
+                                    <tr>
+                                        <td>
+                                            {% for storage in storages %}
+                                                {% if key == storage.id %}
+                                                    {{ storage.small_name }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        {% for key, value in value.items %}
+                                            <td>{{ value|floatformat }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                {% for product in products %}
+                                    <th></th>
+                                {% endfor %}
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            {% else %}
+                <b>
+                    {% for storage in storages %}
+                        {% if storage_id == storage.id %}
+                            {{ storage.name }}
+                        {% endif %}
+                    {% endfor %}
+                </b>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Продукт</th>
+                                <th>Остаток</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in records.items %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>{{ value|floatformat }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            //responsive: true,
+
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            },
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                            i : 0;
+                };
+                let i = 0;
+                while(i < {{ products.count }}) {
+                    pageTotal4 = api.column(i+1, { page: 'current' }).data().reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+                    // Update footer
+                    $(api.column(i+1).footer()).html(
+                        '' + pageTotal4  //+ ' (' + total4 + ' total)'
+                    );
+                    i++;
+                }
+            }
+
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+{% endblock %}

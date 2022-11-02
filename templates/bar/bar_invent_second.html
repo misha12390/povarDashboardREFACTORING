@@ -1,0 +1,26 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-body">
+        <p><b>Инвентаризация.Посуда</b></p>
+        Основной бармен: <b>{{ barmen }}</b>
+        <div class="dropdown-divider"></div>
+        <form action="{% url 'Bar:bar_invent_form_second' storageId %}" method="post">
+            {% csrf_token %}
+            <table>
+                {% for product in bar_products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td><input type="tel" name="{{ product.num }}" id="{{ product.num }}" class="form-control" value="0" size="2"></td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <input type="hidden" name="page_code" value="{{ code }}">
+            <input type="hidden" name="barmen" value="{{ barmen }}">
+            <div class="dropdown-divider"></div>
+            <button type="submit" class="btn btn-success">Отправить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

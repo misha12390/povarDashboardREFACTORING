@@ -1,0 +1,40 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-10">
+    <div class="card-body">
+        <table class="table table-sm" id="table_id">
+            <thead>
+                <tr>
+                    <th>Дата занесения</th>
+                    <th>Фото</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in blacklist %}
+                <tr>
+                    <td>{{ row.date_at }}</td>
+                    <td>
+                        <a class="image-popup" title="Фото" href="/media/{{ row.photo }}black.png">
+                            <i class="align-middle" data-feather="camera"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    
+    $(function () {
+        $('#date_at').datepicker();
+        $('.image-popup').magnificPopup({
+            type: 'image'
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+    <form action="{% url 'Bar:timetable_save' %}" method="post">
+        {% csrf_token %}
+        <div class="card shadow-lg border-0 rounded-lg mt-5">
+            <div class="card-header">
+                Касса утро: {% if sum_cash_morning is not None %}{% if sum_cash_morning == sum_cash_end_day %}<b>{{ sum_cash_morning }}</b>{% else %}<font color="red"><b>{{ sum_cash_morning }}</b></font>{% endif %}{% else %}<input type="tel" class="form-control" name="sum_cash_morning" placeholder="Пересчитайте остаток в кассе" required>{% endif %}
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Позиция</th>
+                            <th>ФИО</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>
+                                <td>
+                                    {% for position in positions %}
+                                        {% if row.position_id == position.id %}
+                                            {{ position.position }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for employee in employees %}
+                                        {% if row.employee_id == employee.id %}
+                                            {{ employee.fio }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% if row.position_id != 1 %}
+                                        <a onclick="if (confirm('Вы уверены?')){ window.location.href='/bar/employee/delete?code={{ code }}&id={{ row.id }}'; }"><i data-feather="user-x"></i></a></td>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input type="hidden" name="code" value="{{ code }}">
+                <table>
+                    {% for position in positions %}
+                        {% if 'вызывной (' not in position.position %}
+                            {% if position.id == 1 %}
+                                {% if barmen == 0 %}
+                                    <tr>
+                                        <td>{{ position.position }}</td>
+                                        <td>
+                                            <select class="form-select" name="position[{{ position.id }}]">
+                                                <option value="0" selected>Выберите</option>
+                                                {% for employee in employees %}
+                                                    {% if position.type == employee.type and employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                                        <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% elif position.id == 9 %}
+                                {% if teh == 0 %}
+                                    <tr>
+                                        <td>{{ position.position }}</td>
+                                        <td>
+                                            <select class="form-select" name="position[{{ position.id }}]">
+                                                <option value="0" selected>Выберите</option>
+                                                {% for employee in employees %}
+                                                    {% if position.type == employee.type and employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                                        <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% else %}
+                                <tr>
+                                    <td>{{ position.position }}</td>
+                                    <td>
+                                        <select class="form-select" name="position[{{ position.id }}]">
+                                            <option value="0" selected>Выберите</option>
+                                            {% for employee in employees %}
+                                                {% if position.type == 'Повар' and employee.type == 'Су-Шеф' and employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                                {% endif %}
+                                                {% if position.type == employee.type and employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% else %}
+                            <tr>
+                                <td>{{ position.position }}</td>
+                                <td>
+                                    <select class="form-select" name="position[{{ position.id }}]">
+                                        <option value="0" selected>Выберите</option>
+                                        {% for employee in employees %}
+                                            {% if position.type == employee.type and employee.is_deleted == 'Активен' %}
+                                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+                <br>
+                <button class="btn btn-success" type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <br>
+{% endblock %}

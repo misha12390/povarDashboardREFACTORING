@@ -1,0 +1,37 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-body">
+        <form action="{% url 'IIKO:nomenclature_edit' %}?id={{ object.id }}"
+            method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="supplier">Поставщик</label>
+                <select name="supplier" id="supplier"
+                class="form-select">
+                <option value="-1" selected>Выберите поставщика</option>
+                {% for supplier in suppliers %}
+                {% if object.supplier_id == supplier.supplier_id %}
+                <option value="{{ supplier.supplier_id }}" selected>{{ supplier.name }}</option>
+                {% else %}
+                <option value="{{ supplier.supplier_id }}">{{ supplier.name }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            </div>
+            <div class="form-group">
+                <label for="minimal">Минимальное количество</label>
+                <input type="text" id="minimal" name="minimal" class="form-control" placeholder="Введите минимальное количество" value="{{ object.minimal }}">
+            </div>
+            <div class="form-group">
+                <label for="wanna_order">Заказать</label>
+                <input type="text" id="wanna_order" name="wanna_order" class="form-control" placeholder="Введите количество для заказа" value="{{ object.wanna_order }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+        </form>
+    </div>
+{% endblock %}

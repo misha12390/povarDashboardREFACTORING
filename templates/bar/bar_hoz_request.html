@@ -1,0 +1,38 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-body">
+        <p><b>Заявка по хоз товарам</b></p>
+        <form action="{% url 'Bar:bar_hoz_request' %}?code={{ code }}" method="post">
+            {% csrf_token %}
+            Выберите сотрудника:
+            <div class="form-group">
+                <label for="employee">Сотрудник</label>
+                <select id="employee" name="employee" class="form-select">
+                    {% for t in timetable %}
+                        {% for employee in employees %}
+                            {% if t.employee_id == employee.id %}
+                            <option value="{{ employee.fio }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="dropdown-divider"></div>
+            <table>
+                {% for product in bar_products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td><input type="tel" name="{{ product.num }}" id="{{ product.num }}" class="form-control" value="0" size="2"></td>
+                        <td>{{ product.main_unit }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <input type="hidden" name="page_code" value="{{ code }}">
+            <div class="dropdown-divider"></div>
+            <button type="submit" class="btn btn-success">Отправить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

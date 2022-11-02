@@ -1,0 +1,85 @@
+{% extends 'lk/form_base.html' %}
+
+{% block content %}
+    <div class="card-header">
+        Копирование ПриходПива
+    </div>
+    <div class="card-body">
+        <form action="{% url 'LK:arrivals_copy' %}?id={{ row.id }}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="date_at">Дата</label>
+                <input type="text" id="date_at" name="date_at" class="form-control" value="{{ row.date_at|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+                <label for="num">Номер накладной</label>
+                <input type="text" id="num" name="num" class="form-control" value="{{ row.num }}">
+            </div>
+            <div class="form-group">
+                <label for="storage_id">Заведение</label>
+                <select class="form-select" name="storage_id" id="storage_id">
+                    {% for storage in storages %}
+                        {% if storage.id == row.storage_id %}
+                            <option value="{{ storage.id }}" selected>{{ storage.name }}</option>
+                        {% else %}
+                            <option value="{{ storage.id }}">{{ storage.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="supplier">Поставщик</label>
+                <select class="form-select" id="supplier" name="supplier">
+                    {% for supplier in suppliers %}
+                        {% if supplier.supplier_id == row.supplier %}
+                            <option value="{{ supplier.supplier_id }}" selected>{{ supplier.name }}</option>
+                        {% else %}
+                            <option value="{{ supplier.supplier_id }}">{{ supplier.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="product">Продукт</label>
+                <select class="form-select" id="product" name="product">
+                    {% for product in products %}
+                        {% if product.product_type == 'GOODS' %}
+                            {% if product.id == row.product %}
+                                <option value="{{ product.id }}" selected>{{ product.name }}</option>
+                            {% else %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount">Количество</label>
+                <input type="text" name="amount" id="amount" class="form-control" value="{{ row.amount }}">
+            </div>
+            <div class="form-group">
+                <label for="sum">Сумма</label>
+                <input type="tel" name="sum" id="sum" class="form-control" value="{{ row.sum }}">
+            </div>
+            <div class="form-group">
+                <label for="type">Статус</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="0" {% if row.type == 0 %}selected{% endif %}>Неоплачено</option>
+                    <option value="1" {% if row.type == 1 %}selected{% endif %}>Оплачено</option>
+                    <option value="2" {% if row.type == 2 %}selected{% endif %}>Оплачено БАР</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(function () {
+            $('#date_at').datepicker();
+        })
+    </script>
+{% endblock %}

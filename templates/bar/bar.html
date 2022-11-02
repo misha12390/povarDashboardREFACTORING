@@ -1,0 +1,256 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-0">
+    <form action="{% url 'Bar:bar' %}" method="post">
+        {% csrf_token %}
+    <div class="card-header">
+        Касса утро: <b>{% if money == 0 %}<input type="tel" name="cash" id="cash" placeholder="Пересчитайте остаток в кассе" class="form-control" required>{% else %} {{ cash_morning }}{% endif %}</b>
+    </div>
+    <div class="card-body">
+            <input type="hidden" name="cafe" id="cafe" value="{{ storage_id }}">
+            <input type="hidden" name="code" id="code" value="{{ code }}">
+            <input type="hidden" name="cafee" value="{{ cafe }}">
+            <table class="table table-sm">
+                <thead>
+                    <th>Позиция</th>
+                    <th>ФИО</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    {% for time in timetable %}
+                        {% if time.storage_id == storage_id %}
+                        <tr>
+                            <td>{{ time.position }}</td>
+                            <td>{% for employee in employees %}{% if employee.id == time.employee_id %}{{ employee.fio }}{% endif %}{% endfor %}</td>
+                            {% if time.position != 'Бармен основной' and time.position != 'Бармен вызывной (основной)' %}
+                            <td>
+                                <a data-bs-toggle="modal" data-bs-target="#exampleModal{{ time.id }}">
+                                    <i data-feather="x-circle"></i>
+                                </a>    
+                            </td>
+                                <div class="modal fade" id="exampleModal{{ time.id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ time.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel{{ time.id }}">Вы действительно хотите удалить сотрудника?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>{{ time.position }} - {% for employee in employees %}{% if employee.id == time.employee_id %}{{ employee.fio }}{% endif %}{% endfor %}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                        <a href="/bar/delete/{{ time.employee_id }}?code={{ code }}" class="btn btn-danger">Удалить</a>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                            <td></td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <table>
+                {% if barmen == 0 %}
+                <tr>
+                    <td>Бармен<br><b>основной</b>:</td>
+                    <td><select class="form-select" name="barmen" id="barmen">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Бармен' and employee.is_deleted == 'Активен' and employee.storage_id == storage_id  and employee.storage_id == storage_id %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>Бармен<br><b>усиление</b>:</td>
+                    <td><select class="form-select" name="barmen_plus" id="barmen_plus">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Бармен' and employee.is_deleted == 'Активен' and employee.storage_id == storage_id  %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                
+                <tr>
+                    <td>Бармен<br><b>стажер</b>:</td>
+                    <td><select class="form-select" name="barmen_stazh" id="barmen_stazh">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Бармен' and employee.is_deleted == 'Активен' %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                <tr><td>Бармен<br><b>вызывной</b>:</td><td><button type="button" class="btn btn-primary" style=" " data-bs-toggle="modal" data-bs-target="#BarmenCall">
+                    Выбрать вызывного
+                </button></td></tr>
+                <tr><td><div class="dropdown-divider"></div></td></tr>
+                <tr>
+                    <td>Повар<br><b>основной</b>:</td>
+                    <td><select class="form-select" name="povar" id="povar">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Повар' or employee.type == 'Су-Шеф' or employee.type == 'Бренд-Шеф' %}
+                                {% if employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                <tr>
+                    <td>Повар<br><b>усиление</b>:</td>
+                    <td><select class="form-select" name="povar_plus" id="povar_plus">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Повар' or employee.type == 'Су-Шеф' or employee.type == 'Бренд-Шеф' %}
+                                {% if employee.is_deleted == 'Активен' and employee.storage_id == storage_id %}
+                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                <tr>
+                    <td>Повар<br><b>стажер</b>:</td>
+                    <td><select class="form-select" name="povar_stazh" id="povar_stazh">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Повар' or employee.type == 'Су-Шеф' or employee.type == 'Бренд-Шеф' %}
+                                {% if employee.is_deleted == 'Активен' %}
+                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                <tr><td>Повар<br><b>вызывной</b>:</td><td><button type="button" class="btn btn-primary" style=" " data-bs-toggle="modal" data-bs-target="#PovarCall">
+                    Выбрать вызывного
+                </button></td></tr>
+                <tr><td><div class="dropdown-divider"></div></td></tr>
+                {% if teh == 0 %}
+                <tr>
+                    <td>Тех. служащий:</td>
+                    <td><select class="form-select" name="teh" id="teh">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Тех. служащий' and employee.is_deleted == 'Активен' and employee.storage_id == storage_id  %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>Тех. служащий<br><b>вызывной</b>:</td>
+                    <td><select class="form-select" name="teh_call" id="teh_call">
+                        <option value="0" selected="">Выберите</option>
+                        {% for employee in employees %}
+                            {% if employee.type == 'Тех. служащий' and employee.is_deleted == 'Активен'  %}
+                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select></td>
+                </tr>
+            </table>
+            <br>
+            <button type="submit" class="btn btn-success">
+                Сохранить
+            </button>
+            <a href="/bar/expenses?code={{ code }}" class="btn btn-secondary">Расходы</a>
+            <a href="/bar/salary?code={{ code }}" class="btn btn-secondary">ЗП аванс (ежедн)</a>
+            
+            <div class="modal fade" id="BarmenCall" tabindex="-1" aria-labelledby="BarmenCallLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="BarmenCallLabel">Подтверждение</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="first_div">
+                            <table>
+                                <tr>
+                                    <td>Бармен <b>вызывной</b>:</td>
+                                    <td><select class="form-select" name="barmen_call" id="barmen_call">
+                                        <option value="0" selected="">Выберите</option>
+                                        {% for employee in employees %}
+                                            {% if employee.type == 'Бармен' and employee.is_deleted == 'Активен' %}
+                                                <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <label for="call">Выберите тип вызывного бармена:</label>
+                            <select name="call" id="call" class="form-select">
+                                <option value="0" selected="">Выберите</option>
+                                <option value="1">Основной</option>
+                                <option value="2">Усиление</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="modal fade" id="PovarCall" tabindex="-1" aria-labelledby="PovarCallLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="PovarCallLabel">Подтверждение</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="first_div">
+                            <table>
+                                <tr>
+                                    <td>Повар <b>вызывной</b>:</td>
+                                    <td><select class="form-select" name="povar_call" id="povar_call">
+                                        <option value="0" selected="">Выберите</option>
+                                        {% for employee in employees %}
+                                            {% if employee.type == 'Повар' or employee.type == 'Су-Шеф' or employee.type == 'Бренд-Шеф' %}
+                                                {% if employee.is_deleted == 'Активен' %}
+                                                    <option value="{{ employee.id }}">{{ employee.fio }}</option>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select></td>
+                                </tr>
+                            </table>
+                            <br>
+                            <label for="call">Выберите тип вызывного повара:</label>
+                            <select name="call2" id="call2" class="form-select">
+                                <option value="" selected="">Выберите..</option>
+                                <option value="1">Основной</option>
+                                <option value="2">Усиление</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div><br>
+{% endblock %}

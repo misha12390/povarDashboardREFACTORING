@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <a href="/iiko/categories?update=1" class="btn btn-outline-primary">Обновить категории</a>
+            <br>
+            <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Участвует в остатках</th>
+                        <th>Участвует в продажах</th>
+                        <th>Участвует в поступлениях</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.name }}</td>
+                        <td>{% if category.is_remains == 1 %}Да{% else %}Нет{% endif %}</td>
+                        <td>{% if category.is_sales == 1 %}Да{% else %}Нет{% endif %}</td>
+                        <td>{% if category.is_income == 1 %}Да{% else %}Нет{% endif %}</td>
+                        <td><a href="/povar/iiko/categories/edit/{{ category.id }}"><i data-feather="edit"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

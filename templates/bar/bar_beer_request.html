@@ -1,0 +1,55 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-0">
+    <div class="card-body">
+        <p><b>Заявка по пиву</b></p>
+        Основной бармен: <b>{{ barmen }}</b>
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th>Пиво</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.product_name }}</td>
+                        <td><a onclick="if (confirm('Вы уверены?')){ window.location.href='/bar/request/beer/delete?code={{ code }}&id={{ row.id }}'; }"><i data-feather="x-circle"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="dropdown-divider"></div>
+        <form action="{% url 'Bar:bar_beer_request' %}?code={{ code }}" method="post">
+            {% csrf_token %}
+            <table>
+                {% for product in bar_products %}
+                    <tr>
+                        <td>
+                            <div class="form-check ">
+                                <input class="form-check-input" type="checkbox" name="{{ product.num }}">
+                            </div>
+                        </td>
+                        <td>{{ product.name }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <input type="hidden" name="page_code" value="{{ code }}">
+            <input type="hidden" name="barmen" value="{{ barmen }}">
+            <div class="dropdown-divider"></div>
+            <button type="submit" class="btn btn-success">Отправить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function getValue(litr, num) {
+            var select = document.getElementById(num + '_' + litr);
+            return select.value
+        }
+    </script>
+{% endblock  %}

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            {% if type == '1' %}
+                <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Артикул</th>
+                            <th>Код</th>
+                            <th>Название</th>
+                            <th>Тип продукта</th>
+                            <th>mainUnit</th>
+                            <th>Категория продукта</th>
+                            <th>Поставщик</th>
+                            <th>Минимальное количество</th>
+                            <th>Заказать</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            {% if product.product_type == 'GOODS' %}
+                                {% if product.product_category != 'Удалено' %}
+                                    <tr>
+                                        <td >
+                                            {{ product.num }}
+                                        </td>
+                                        <td>
+                                            {{ product.code }}
+                                        </td>
+                                        <td>
+                                            {{ product.name }}
+                                        </td>
+                                        <td>
+                                            {{ product.product_type }}
+                                        </td>
+                                        <td>
+                                            {{ product.main_unit }}
+                                        </td>
+                                        <td>
+                                            {{ product.product_category }}
+                                        </td>
+                                        <td>
+                                            {% for supplier in suppliers %}
+                                            {% if supplier.supplier_id == product.supplier_id %}
+                                            {{ supplier.name }}
+                                            {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {{ product.minimal }}
+                                        </td>
+                                        <td>
+                                            {{ product.wanna_order }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'IIKO:nomenclature_edit' %}?id={{ product.id }}"><i data-feather="edit"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% else %}
+                <table id="table_id" class="table table-striped table-bordered table-sm dt-responsive nowrap w-100">
+                    <thead>
+                        <tr class="column-filter dt-column-filter">
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder=""></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Артикул</th>
+                            <th>Код</th>
+                            <th>Название</th>
+                            <th>Тип продукта</th>
+                            <th>mainUnit</th>
+                            <th>Категория продукта</th>
+                            <th>Поставщик</th>
+                            <th>Минимальное количество</th>
+                            <th>Заказать</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            {% if product.product_type == 'DISH' %}
+                                {% if product.product_category != 'Удалено' %}
+                                    <tr>
+                                        <td >
+                                            {{ product.num }}
+                                        </td>
+                                        <td>
+                                            {{ product.code }}
+                                        </td>
+                                        <td>
+                                            {{ product.name }}
+                                        </td>
+                                        <td>
+                                            {{ product.product_type }}
+                                        </td>
+                                        <td>
+                                            {{ product.main_unit }}
+                                        </td>
+                                        <td>
+                                            {{ product.product_category }}
+                                        </td>
+                                        <td>
+                                            {% for supplier in suppliers %}
+                                            {% if supplier.supplier_id == product.supplier_id %}
+                                            {{ supplier.name }}
+                                            {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {{ product.minimal }}
+                                        </td>
+                                        <td>
+                                            {{ product.wanna_order }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'IIKO:nomenclature_edit' %}?id={{ product.id }}"><i data-feather="edit"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            }
+        })
+        // Apply column filter
+        $('#table_id .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+<script>
+    $(() => {
+        // Run datatable
+        var table = $('#table_id2').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.11.1/i18n/ru.json"
+            },
+            lengthMenu: [10, 25, 50, 100, 200, 500],
+            pageLength: 25,
+            drawCallback: function () {
+                $('.dataTables_paginate > .pagination').addClass('pagination-sm') // make pagination small
+            }
+        })
+        // Apply column filter
+        $('#table_id2 .dt-column-filter th').each(function (i) {
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw()
+                }
+            })
+        })
+        // Toggle Column filter function
+        var responsiveFilter = function (table, index, val) {
+            var th = $(table).find('.dt-column-filter th').eq(index)
+            val === true ? th.removeClass('d-none') : th.addClass('d-none')
+        }
+        // Run Toggle Column filter at first
+        $.each(table.columns().responsiveHidden(), function (index, val) {
+            responsiveFilter('#table_id', index, val)
+        })
+        // Run Toggle Column filter on responsive-resize event
+        table.on('responsive-resize', function (e, datatable, columns) {
+            $.each(columns, function (index, val) {
+                responsiveFilter('#table_id', index, val)
+            })
+        })
+    })
+</script>
+{% endblock %}

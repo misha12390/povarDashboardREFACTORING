@@ -1,0 +1,35 @@
+{% extends 'bar/base.html' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-10">
+    <div class="card-body">
+        <div id="calendar"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ru',
+        firstDay: 1,
+        header: {
+            left: 'prev,next',
+            center: 'title',
+            right: 'month'
+        },
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthNamesShort: ['Янв.', 'Фев.', 'Март', 'Апр.', 'Май', 'Июнь', 'Июль', 'Авг.', 'Сент.', 'Окт.', 'Ноя.', 'Дек.'],
+        dayNames: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+        dayNamesShort: ["ВС", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ"],
+        displayEventTime: false,
+        events: '/static/ajax/{{ storage_id }}load.php'
+      });
+      calendar.render();
+    });
+
+  </script>
+{% endblock %}
